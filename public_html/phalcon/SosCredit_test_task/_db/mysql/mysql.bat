@@ -1,0 +1,1 @@
+C:\Bitnami\wampstack-5.6.24-0\mysql\bin\mysql.exe -uroot -prooter %1 %2 %3

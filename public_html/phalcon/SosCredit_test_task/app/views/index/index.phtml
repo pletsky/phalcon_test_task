@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <?php echo $this->tag->getTitle(); ?>
+        <?php echo $this->tag->stylesheetLink('css/bootstrap.min.css'); ?>
+    </head>
+    <body>
+        <?php echo $this->getContent(); ?>
+        <?php echo $this->tag->javascriptInclude('js/jquery.min.js'); ?>
+        <?php echo $this->tag->javascriptInclude('js/bootstrap.min.js'); ?>
+        <?php echo $this->tag->javascriptInclude('js/utils.js'); ?>
+
+<?php
+
+echo "<h1>Messages list task</h1>";
+
+echo '<div>'.$this->tag->linkTo("index/new", "Create Message").'</div>';
+
+if (count($page->items)) { 
+
+    foreach ($page->items as $i=>$message) { 
+
+        if ($i==0) { 
+
+?>
+    <table cellpadding="2" cellspacing="5">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Message</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+    <tbody>
+<?php
+        }
+?>
+  <tr>
+    <td><?=$message->id?></td>
+    <td><?=$message->name?></td>
+    <td><?=$message->phone?></td>
+    <td><?=$message->email?></td>
+    <td><?=$message->text?></td>
+    <td><?=date("Y-M-d", strtotime($message->add_date))?></td>
+    <td width="7%"><?=$this->tag->linkTo("index/edit/".$message->id, 'Edit')?></td>
+    <td width="7%"><?=$this->tag->linkTo("index/delete/".$message->id, 'Delete')?></td>
+  </tr>
+<?php
+        if ($i==(count($page->items)-1)) { 
+
+?>
+  </tbody>
+<?php
+            if (1 < $page->total_pages) {
+?>
+    <tbody>
+      <tr>
+        <td colspan="7">
+          <div>
+            <?=Phalcon\Tag::linkTo("index", 'Первая')?>
+            <?=Phalcon\Tag::linkTo("index/index?page=".$page->before, 'Предыдущая')?>
+            <?=Phalcon\Tag::linkTo("index/index?page=".$page->next, 'Следующая')?>
+            <?=Phalcon\Tag::linkTo("index/index?page=".$page->last, 'Последняя')?>
+            <span class="help-inline"><?=$page->current?> из <?=$page->total_pages?></span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+<?php
+            }
+?>
+  </table>
+<?php
+        }
+    }
+}
+else
+{
+
+?>
+  No messages in database
+<?php
+}
+?>
+
+    </body>
+</html>
