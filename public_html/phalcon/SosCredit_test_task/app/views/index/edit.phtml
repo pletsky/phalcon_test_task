@@ -1,8 +1,18 @@
+<?php 
+include('header.phtml');
 
-<?php echo $this->tag->form(array('index/save', 'role' => 'form')); ?>
+echo '<h1>Edit Message</h1>';
+
+echo $this->tag->form(array('index/save', 'role' => 'form')); ?>
 
 <?php
     include('fieldset.phtml');
 ?>
 
-</form>
+        </form>
+
+<?php
+
+include('footer.phtml');
+
+?>

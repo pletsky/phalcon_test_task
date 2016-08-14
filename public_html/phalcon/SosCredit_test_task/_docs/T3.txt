@@ -1,7 +1,3 @@
-<FilesMatch ".(pl|php|cgi|spl|scgi|fcgi)$">
-  Header unset Cache-Control
-</FilesMatch>
-
 “естовое задание:
 Х Ќаписать простой CRUD интерфейс, который включает грид и форму
 Х »спользу€ php framework phalcon 2 (https://phalconphp.com/ru/)

@@ -1,31 +1,15 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <?php echo $this->tag->getTitle(); ?>
-        <?php echo $this->tag->stylesheetLink('css/bootstrap.min.css'); ?>
-    </head>
-    <body>
-        <?php echo $this->getContent(); ?>
-        <?php echo $this->tag->javascriptInclude('js/jquery.min.js'); ?>
-        <?php echo $this->tag->javascriptInclude('js/bootstrap.min.js'); ?>
-        <?php echo $this->tag->javascriptInclude('js/utils.js'); ?>
+<?php 
+include('header.phtml');
 
-<?php
+echo '<h1>Messages list</h1>';
 
-echo "<h1>Messages list task</h1>";
-
-echo '<div>'.$this->tag->linkTo("index/new", "Create Message").'</div>';
-
-if (count($page->items)) { 
-
-    foreach ($page->items as $i=>$message) { 
-
-        if ($i==0) { 
+$this->getContent();
+//vdump_e($this->session->get('name'));
 
 ?>
-    <table cellpadding="2" cellspacing="5">
-      <thead>
+
+<table class="table table-bordered table-striped" align="center">
+    <thead>
         <tr>
           <th>Id</th>
           <th>Name</th>
@@ -33,47 +17,89 @@ if (count($page->items)) {
           <th>Email</th>
           <th>Message</th>
           <th>Date</th>
+          <th colspan="2">&nbsp;</th>
         </tr>
-      </thead>
+    </thead>
     <tbody>
+      <form id="message_search_form" action="/index/index/" method="post">
+        <tr><input type="hidden" name="search" value="1">
+            <td>&nbsp;</td>
+            <td><input type="text" id="search_name" name="name" value="<?=$this->session->get('name')?>" class="form-control"></td>
+            <td><input type="text" id="search_phone" name="phone" value="<?=$this->session->get('phone')?>" class="form-control"></td>
+            <td><input type="text" id="search_email" name="email" value="<?=$this->session->get('email')?>" class="form-control"></td>
+            <td>&nbsp;</td>
+            <td>&nbsp;</td>
+            <td colspan="2" align="center"><input type="submit" value="Search" class="btn"></td>
+        </tr>
+      </form>
+    </tbody>
+    <tbody>
+      <form id="message_add_form">
+        <tr>
+            <td>&nbsp;</td>
+            <td><input type="text" id="name" name="name" class="form-control"></td>
+            <td><input type="text" id="phone" name="phone" class="form-control"></td>
+            <td><input type="text" id="email" name="email" class="form-control"></td>
+            <td><input type="text" id="text" name="text" class="form-control"></td>
+            <td>&nbsp;</td>
+            <td colspan="2" align="center"><input type="submit" value="Create Message" class="btn btn-success"></td>
+        </tr>
+      </form>
+    </tbody>
+
+
+<tbody>
+
+<?php
+
+if (isset($page) && count($page->items)) { 
+
+    foreach ($page->items as $i=>$message) { 
+
+        if ($i==0) { 
+
+?>
 <?php
         }
 ?>
-  <tr>
+  <tr id="msg<?=$message->id?>">
     <td><?=$message->id?></td>
     <td><?=$message->name?></td>
     <td><?=$message->phone?></td>
     <td><?=$message->email?></td>
     <td><?=$message->text?></td>
     <td><?=date("Y-M-d", strtotime($message->add_date))?></td>
-    <td width="7%"><?=$this->tag->linkTo("index/edit/".$message->id, 'Edit')?></td>
-    <td width="7%"><?=$this->tag->linkTo("index/delete/".$message->id, 'Delete')?></td>
+    <td width="7%"><?php echo $this->tag->linkTo(array('index/edit/'.$message->id, '<i class="glyphicon glyphicon-edit"></i> Edit', 'class' => 'btn btn-default')); ?></td>
+    <td width="7%"><?php echo $this->tag->linkTo(array('#', '<i class="glyphicon glyphicon-remove"></i> Delete', 'onclick'=>'if (confirm(\'Delete?\')) { messageDelete('.$message->id.'); return false; }', 'class' => 'btn btn-default')); ?></td>
   </tr>
 <?php
+
         if ($i==(count($page->items)-1)) { 
 
 ?>
-  </tbody>
+</tbody>
+
 <?php
             if (1 < $page->total_pages) {
 ?>
     <tbody>
-      <tr>
-        <td colspan="7">
-          <div>
-            <?=Phalcon\Tag::linkTo("index", 'Первая')?>
-            <?=Phalcon\Tag::linkTo("index/index?page=".$page->before, 'Предыдущая')?>
-            <?=Phalcon\Tag::linkTo("index/index?page=".$page->next, 'Следующая')?>
-            <?=Phalcon\Tag::linkTo("index/index?page=".$page->last, 'Последняя')?>
-            <span class="help-inline"><?=$page->current?> из <?=$page->total_pages?></span>
-          </div>
-        </td>
-      </tr>
+        <tr>
+            <td colspan="8" align="right">
+                <div class="btn-group">
+                    <?php echo $this->tag->linkTo(array('index/index', '<i class="icon-fast-backward"></i> First', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('index/index?page=' . $page->before, '<i class="icon-step-backward"></i> Previous', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('index/index?page=' . $page->next, '<i class="icon-step-forward"></i> Next', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('index/index?page=' . $page->last, '<i class="icon-fast-forward"></i> Last', 'class' => 'btn btn-default')); ?>
+                    <span class="help-inline"><?php echo $page->current; ?>/<?php echo $page->total_pages; ?></span>
+                </div>
+            </td>
+        </tr>
     </tbody>
+
 <?php
             }
 ?>
-  </table>
+
 <?php
         }
     }
@@ -87,5 +113,15 @@ else
 }
 ?>
 
-    </body>
-</html>
+  </table>
+
+<script type="text/javascript">
+  messageAdd();
+</script>
+
+<?
+
+include('footer.phtml');
+?>
+
+

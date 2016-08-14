@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS messages;
 
 CREATE TABLE messages (
  id SERIAL PRIMARY KEY,
- name varchar(40) NOT NULL CHECK (name <> ''),
+ name varchar(100) NOT NULL CHECK (name <> ''),
  phone varchar (20),
  email varchar(100) NOT NULL CHECK (email <> ''),
  text varchar(200) NOT NULL CHECK (text <>''),

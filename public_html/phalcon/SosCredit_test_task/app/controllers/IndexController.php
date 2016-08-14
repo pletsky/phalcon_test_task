@@ -7,20 +7,51 @@ use Phalcon\Paginator\Adapter\Model as Paginator;
 class IndexController extends ControllerBase
 {
 
+    public function jsonAction($id)
+    {
+    }
+
+    public function rowAction($id)
+    {
+        $parameters = array(    "conditions"=>"[id] = :id:",    "bind"=>array(        "id"=>$id,    ));
+        $messages = Messages::find($parameters);
+
+        if (count($messages))
+        {
+            $paginator = new Paginator(
+                array(
+                    "data"  => $messages,  // Данные для пагинации
+                    "limit" => 1,          // Количество записей на страницу
+                    "page"  => 1 // Активная страница
+                 )
+            );
+
+            // Получаем активную страницу пагинатора
+            $this->view->page = $paginator->getPaginate();
+        }
+    }
+
     public function indexAction()
     {
-//var_dump(__LINE__);
-//        $this->session->conditions = null;
-//var_dump(__LINE__, '1');
-//        $this->view->form = new MessagesForm;
-//var_dump($this->view->form);
+/*
+        $this->session->conditions = null;
+        $this->view->form = new ProductsForm;
+*/
+//vdump_e($this);
+        $this->session->start();
 
         $numberPage = 1;
         if ($this->request->isPost())
         {
+            if ($this->request->getPost('search')) {
+                foreach (array('name', 'phone', 'email') as $k) {
+                    $this->session->set($k, $this->request->getPost($k));
+                }
+            }
+//vdump_e($this->session->get('name'), '$this->session');
             // Формируем условия запроса
             $query = Criteria::fromInput($this->di, "Messages", $this->request->getPost());
-//            $this->persistent->searchParams = $query->getParams();
+            $this->persistent->searchParams = $query->getParams();
         } else {
             $numberPage = $this->request->getQuery("page", "int");
         }
@@ -29,27 +60,29 @@ class IndexController extends ControllerBase
         if ($this->persistent->searchParams) {
             $parameters = $this->persistent->searchParams;
         }
-//var_dump(__LINE__);
 
-//var_dump($parameters);
+
+
         $messages = Messages::find($parameters);
-//var_dump(count($messages));
+
+
+
         if (count($messages) == 0)
         {
             $this->flash->notice("No messages");
-            return $this->forward("index/new");
+        } else {
+
+            $paginator = new Paginator(
+                array(
+                    "data"  => $messages,  // Данные для пагинации
+                    "limit" => 10,          // Количество записей на страницу
+                    "page"  => $numberPage // Активная страница
+                )
+            );
+
+            // Получаем активную страницу пагинатора
+            $this->view->page = $paginator->getPaginate();
         }
-
-        $paginator = new Paginator(
-            array(
-                "data"  => $messages,  // Данные для пагинации
-                "limit" => 10,          // Количество записей на страницу
-                "page"  => $numberPage // Активная страница
-            )
-        );
-
-        // Получаем активную страницу пагинатора
-        $this->view->page = $paginator->getPaginate();
     }
 
     /**
@@ -77,19 +110,6 @@ class IndexController extends ControllerBase
         }
     }
 
-    public function edit1Action($id)
-    {
-        if (!$this->request->isPost()) {
-
-            $message = Messages::findFirstById($id);
-            if (!$message) {
-                $this->flash->error("Message was not found");
-                return $this->forward("index");
-            }
-
-            $this->view->form = new MessagesForm($message, array('edit1' => true));
-        }
-    }
 
     /**
      * Creates a new message
@@ -121,8 +141,49 @@ class IndexController extends ControllerBase
         $form->clear();
 
         $this->flash->success("Message was created successfully");
-        return $this->forward("index");
+
+        $this->forward("index");
     }
+
+
+
+    public function ajax_createAction()
+    {
+        $ar = array();
+
+        if (!$this->request->isPost()) {
+
+            $ar = array('res'=>false, 'msg'=>'Request type is incorrect');
+
+        } else {
+
+            $form = new MessagesForm;
+            $message = new Messages();
+
+            $data = $this->request->getPost();
+
+            if (!$form->isValid($data, $message)) {
+
+                foreach ($form->getMessages() as $msg) {
+                    $ar[] = $msg;
+                }
+                $ar = array('res'=>false, 'msg'=>implode("\n", $ar));
+
+            } elseif ($message->save() == false) {
+
+                foreach ($message->getMessages() as $msg) {
+                    $ar[] = $msg;
+                }
+                $ar = array('res'=>false, 'msg'=>implode("\n", $ar));
+
+            } else {
+                 return $this->forward("index/row/".$message->id);
+            }
+        }
+
+        echo json_encode($ar);
+    }
+
 
     /**
      * Saves current message in screen
@@ -192,6 +253,30 @@ class IndexController extends ControllerBase
 
         $this->flash->success("Message was deleted");
         return $this->forward("index");
+    }
+
+    /**
+     * Deletes a message
+     *
+     * @param string $id
+     */
+    public function ajax_deleteAction($id)
+    {
+        $messages = Messages::findFirstById($id);
+
+        if (!$messages) {
+            $ar = array('res'=>false, 'txt'=>"Message was not found");
+        } elseif (!$messages->delete()) {
+            foreach ($messages->getMessages() as $message) {
+                $ar[] = $message;
+            }
+            $ar = array('res'=>false, 'txt'=>implode(';', $ar));
+        } else {
+
+            $ar = array('res'=>true, 'txt'=>"Message was deleted");
+        }
+
+        echo json_encode($ar);
     }
 
 }

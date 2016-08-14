@@ -1,5 +1,4 @@
 <?php
-
 include ('../functions/debug.php');
 
 use Phalcon\Loader;
