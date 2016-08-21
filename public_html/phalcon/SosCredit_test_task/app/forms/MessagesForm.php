@@ -19,12 +19,7 @@ class MessagesForm extends Form
      */
     public function initialize($entity = null, $options = array())
     {
-        if (!isset($options['edit'])) {
-            $element = new Text("id");
-            $this->add($element->setLabel("Id"));
-        } else {
-            $this->add(new Hidden("id"));
-        }
+        $this->add(new Hidden("id"));
 
         $name = new Text("name");
         $name->setLabel("Name");

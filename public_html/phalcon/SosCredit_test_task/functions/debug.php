@@ -1,5 +1,5 @@
 <?php
-//define('DEBUG_MODE', 0);
+define('DEBUG_MODE', 0);
 defined('DEBUG_MODE') || define('DEBUG_MODE', 1);
 
 function msg($expression, $lable='') {

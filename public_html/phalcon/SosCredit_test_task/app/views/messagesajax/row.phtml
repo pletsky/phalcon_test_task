@@ -1,0 +1,7 @@
+<?php
+
+if (count($page->items)) { 
+    foreach ($page->items as $i=>$message) { 
+        include('/../messages/row.phtml');
+    }
+}

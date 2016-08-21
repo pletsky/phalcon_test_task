@@ -1,1 +1,1 @@
-"C:\Program Files (x86)\PostgreSQL\9.6\bin\psql.exe" -U postgres -h localhost -d test -p 5432 -f init.sql < p.txt
+"C:\Program Files (x86)\PostgreSQL\9.6\bin\psql.exe" -U postgres -h localhost -d test -p 5432 -f init.sql

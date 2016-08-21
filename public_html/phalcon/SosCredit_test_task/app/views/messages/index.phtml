@@ -1,0 +1,131 @@
+<?php 
+include('header.phtml');
+
+echo '<h1>Messages list</h1>';
+
+$this->getContent();
+
+?>
+
+<table class="table table-bordered table-striped" align="center">
+    <thead>
+        <tr>
+<?php
+        foreach($fields_titles as $f) {
+?>
+          <th><?=$f?></th>
+<?php
+        }
+?>
+          <th colspan="2">&nbsp;</th>
+        </tr>
+    </thead>
+    <tbody>
+      <form id="message_search_form" action="/messages/index/" method="post">
+        <tr><input type="hidden" name="search" value="1">
+<?php
+        foreach($search_fields as $f) {
+            if (empty($f)) {
+?>
+            <td>&nbsp;</td>
+<?php
+            } else {
+?>
+            <td><input type="text" id="search_<?=$f?>" name="<?=$f?>" value="<?=$this->session->get($f)?>" class="form-control"></td>
+<?php
+            }
+        }
+?>
+            <td colspan="2" align="center"><input type="submit" value="Search" class="btn"></td>
+        </tr>
+      </form>
+    </tbody>
+    <tbody>
+      <form id="message_add_form">
+        <tr>
+<?php
+        foreach($insert_fields as $f) {
+            if (empty($f)) {
+?>
+            <td>&nbsp;</td>
+<?php
+            } else {
+?>
+            <td><input type="text" id="<?=$f?>" name="<?=$f?>" class="form-control"></td>
+<?php
+            }
+        }
+?>
+            <td colspan="2" align="center"><input type="submit" value="Create Message" class="btn btn-success"></td>
+        </tr>
+      </form>
+    </tbody>
+
+
+<tbody>
+
+<?php
+
+if (isset($page) && count($page->items)) { 
+
+    foreach ($page->items as $i=>$message) { 
+
+        if ($i==0) { 
+
+?>
+<?php
+        }
+
+        include('row.phtml');
+
+        if ($i==(count($page->items)-1)) { 
+
+?>
+</tbody>
+
+<?php
+            if (1 < $page->total_pages) {
+?>
+    <tbody>
+        <tr>
+            <td colspan="8" align="right">
+                <div class="btn-group">
+                    <?php echo $this->tag->linkTo(array('messages/index', '<i class="icon-fast-backward"></i> First', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('messages/index/page/' . $page->before, '<i class="icon-step-backward"></i> Previous', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('messages/index/page/' . $page->next, '<i class="icon-step-forward"></i> Next', 'class' => 'btn btn-default')); ?>
+                    <?php echo $this->tag->linkTo(array('messages/index/page/' . $page->last, '<i class="icon-fast-forward"></i> Last', 'class' => 'btn btn-default')); ?>
+                    <span class="help-inline"><?php echo $page->current; ?>/<?php echo $page->total_pages; ?></span>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+
+<?php
+            }
+?>
+
+<?php
+        }
+    }
+}
+else
+{
+
+?>
+  No messages in database
+<?php
+}
+?>
+
+  </table>
+
+<script type="text/javascript">
+  messageAdd();
+</script>
+
+<?
+
+include('footer.phtml');
+?>
+
+

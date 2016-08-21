@@ -21,5 +21,6 @@ class Messages extends Model
 //        $this->add_date = new RawValue('now()');
     }
 
+
 }
 

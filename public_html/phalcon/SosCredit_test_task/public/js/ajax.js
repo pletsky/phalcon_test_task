@@ -2,7 +2,7 @@
 
 function messageDelete(id) {
 
-    var url = "/index/ajax_delete/"+id; // the script where you handle the form input.
+    var url = "/messagesajax/delete/"+id; // the script where you handle the form input.
 
     $.ajax({
         type: "POST",
@@ -30,14 +30,14 @@ function messageAdd() {
 
   $("#message_add_form").submit(function(e) {
 
-    var url = "/index/ajax_create/"; // the script where you handle the form input.
+    var url = "/messagesajax/create/"; // the script where you handle the form input.
 
     $.ajax({
         type: "POST",
         url: url,
         data: $("#message_add_form").serialize(), // serializes the forms elements.
         success: function(data) {
-//alert(data);
+
             try {
                 var obj = jQuery.parseJSON(data);
                 if (obj.res == false) {

@@ -8,6 +8,7 @@ use Phalcon\Di\FactoryDefault;
 use Phalcon\Mvc\Url as UrlProvider;
 //use Phalcon\Db\Adapter\Pdo\Mysql as DbAdapter;
 use Phalcon\Db\Adapter\Pdo\Postgresql as DbAdapter;
+use Phalcon\Session\Adapter\Files as Session;
 
 try {
 
@@ -16,6 +17,7 @@ try {
     $loader->registerDirs(array(
         '../app/controllers/',
         '../app/forms/',
+        '../app/grids/',
         '../app/models/'
     ))->register();
 
@@ -55,6 +57,13 @@ try {
         $url = new UrlProvider();
         $url->setBaseUri('/');
         return $url;
+    });
+
+    $di->set('session', function () {
+//vdump_e(__FILE__);
+        $session = new Session();
+        $session->start();
+        return $session;
     });
 
     $application = new Application($di);
